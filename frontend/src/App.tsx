@@ -4,6 +4,9 @@ import './App.css';
 function App() {
   const [users, setUsers] = useState(null);
   const [usersLog, setUsersLog] = useState(null);
+  
+  const [error, setError] = useState("");
+  const [joke, setJoke] = useState<any>(null)
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -61,6 +64,26 @@ function App() {
         console.error('Error:', error);
       });
   };
+  const fetchJoke = async () => {
+    try{
+      const res = await fetch('http://localhost:5000/users');
+      const joke = await res.json();
+      setJoke(joke);
+      setError("");
+      if(!res.ok){
+        throw new Error("failed to load joke");
+      }
+    }
+    catch (er) {
+      if (er instanceof Error) {
+        setError(er.message);
+      } else {
+        setError(String(er));
+      }
+      setJoke({});
+    }
+  }
+
 
   return (
     <>
@@ -86,7 +109,8 @@ function App() {
 
       <div>
         <h1>All users / Response</h1>
-        <pre>{users && JSON.stringify(users, null, 2)}</pre>
+        <button onClick={fetchJoke}>click</button>
+        <p>{joke.name}</p>
       </div>
     </>
   );

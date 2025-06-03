@@ -42,7 +42,7 @@ def user_crud_routes(app):
         cursor.close()
         con.close()
 
-        return users  # returns list of users
+        return jsonify(users)  # returns list of users
 
     # ✅ GET single user by ID
     @app.route('/users/<int:id>', methods=['GET'])

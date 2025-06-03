@@ -6,7 +6,7 @@ function App() {
   const [usersLog, setUsersLog] = useState(null);
   
   const [error, setError] = useState("");
-  const [joke, setJoke] = useState<any>(null)
+  const [user, setUser] = useState<any>(null)
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -64,25 +64,27 @@ function App() {
         console.error('Error:', error);
       });
   };
-  const fetchJoke = async () => {
-    try{
-      const res = await fetch('http://localhost:5000/users');
-      const joke = await res.json();
-      setJoke(joke);
-      setError("");
-      if(!res.ok){
-        throw new Error("failed to load joke");
-      }
+  const fetchUsers = async () => {
+  try {
+    const res = await fetch('http://localhost:5000/users');
+
+    if (!res.ok) {
+      throw new Error("Failed to load users");
     }
-    catch (er) {
-      if (er instanceof Error) {
-        setError(er.message);
-      } else {
-        setError(String(er));
-      }
-      setJoke({});
+
+    const users = await res.json();
+    setUsers(users);  // Better name than setJoke
+    setError("");
+  } catch (er) {
+    if (er instanceof Error) {
+      setError(er.message);
+    } else {
+      setError(String(er));
     }
+    setUsers([]);  // Reset to empty array
   }
+};
+
 
 
   return (
@@ -109,8 +111,8 @@ function App() {
 
       <div>
         <h1>All users / Response</h1>
-        <button onClick={fetchJoke}>click</button>
-        <p>{joke.name}</p>
+        <button onClick={fetchUsers}>click</button>
+        <p>{user && user.name}</p>
       </div>
     </>
   );

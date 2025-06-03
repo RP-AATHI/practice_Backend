@@ -112,7 +112,7 @@ function App() {
       <div>
         <h1>All users / Response</h1>
         <button onClick={fetchUsers}>click</button>
-        <p>{user && user.name}</p>
+        <p>{users && users.name}</p>
       </div>
     </>
   );

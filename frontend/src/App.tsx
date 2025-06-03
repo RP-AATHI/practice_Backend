@@ -13,6 +13,7 @@ function App() {
     const form = event.target;
     const formData = new FormData(form);
     const data = {
+      
       name: formData.get('name'),
       user_name: formData.get('username'),
       email: formData.get('mail'),

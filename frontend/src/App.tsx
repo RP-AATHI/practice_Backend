@@ -2,120 +2,43 @@ import { useState } from 'react';
 import './App.css';
 
 function App() {
-  const [users, setUsers] = useState(null);
-  const [usersLog, setUsersLog] = useState(null);
-  
+  const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
-  const [user, setUser] = useState<any>(null)
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const form = event.target;
-    const formData = new FormData(form);
-    const data = {
-      
-      name: formData.get('name'),
-      user_name: formData.get('username'),
-      email: formData.get('mail'),
-      password: formData.get('pass'),
-    };
-
-    fetch('http://localhost:5000/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((result) => {
-        console.log("Registered:", result);
-        setUsers(result);
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-  };
-
-  const handleLogin = (event) => {
-    event.preventDefault();
-    const form = event.target;
-    const formData = new FormData(form);
-    const data = {
-      user_name: formData.get('username'),
-      password: formData.get('password'),
-    };
-
-    fetch('http://localhost:5000/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((result) => {
-        console.log("Logged in:", result);
-        setUsersLog(result);
-        if(200 === result.status) {
-          alert("Login successful");
-        }
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-  };
   const fetchUsers = async () => {
-  try {
-    const res = await fetch('http://localhost:5000/users');
-
-    if (!res.ok) {
-      throw new Error("Failed to load users");
+    try {
+      const res = await fetch('http://127.0.0.1:5000/users');
+      if (!res.ok) {
+        throw new Error("Failed to load users");
+      }
+      const users = await res.json();
+      setUsers(users);  // Set the list of users
+      setError("");
+    } catch (er) {
+      setError(er instanceof Error ? er.message : String(er));
+      setUsers([]);
     }
-
-    const users = await res.json();
-    setUsers(users);  // Better name than setJoke
-    setError("");
-  } catch (er) {
-    if (er instanceof Error) {
-      setError(er.message);
-    } else {
-      setError(String(er));
-    }
-    setUsers([]);  // Reset to empty array
-  }
-};
-
-
+  };
 
   return (
-    <>
-      <div>
-        <form onSubmit={handleSubmit}>
-          <h1>New registration</h1>
-          <label>Name</label><input name="name" type="text" placeholder='enter your name' /><br />
-          <label>Username</label><input name="username" type="text" placeholder='user name' /><br />
-          <label>Email</label><input name="mail" type="email" placeholder='email' /><br />
-          <label>Password</label><input name="pass" type="password" placeholder='password' /><br />
-          <input type="submit" value="Register" />
-        </form>
-      </div>
+    <div>
+      <h1>All Users / Response</h1>
+      <button onClick={fetchUsers}>Click</button>
 
-      <div>
-        <form onSubmit={handleLogin}>
-          <h1>Old registration</h1>
-          <label>Username</label><input name="username" type="text" placeholder='user name' /><br />
-          <label>Password</label><input name="password" type="password" placeholder='password' /><br />
-          <input type="submit" value="Login" />
-        </form>
-      </div>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      <div>
-        <h1>All users / Response</h1>
-        <button onClick={fetchUsers}>click</button>
-        <p>{users && users.name}</p>
-      </div>
-    </>
+      {users.length > 0 ? (
+        <ul>
+          {users.map((user) => (
+            <li key={user.id}>
+              <strong>{user.name}</strong> ({user.user_name}) - {user.email}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No users loaded yet.</p>
+      )}
+    </div>
   );
 }
 
